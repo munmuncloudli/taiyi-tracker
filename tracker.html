@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CNC 生產追蹤系統</title>
+    <style>
+        body { font-family: sans-serif; background: #17181a; color: white; padding: 15px; }
+        .container { max-width: 600px; margin: auto; }
+        h2 { text-align: center; }
+        input, select, button { width: 100%; padding: 12px; margin: 6px 0; box-sizing: border-box; border-radius: 6px; font-size: 16px; border: 1px solid #555; background: #25282c; color: white; }
+        button { border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; }
+        .btn-green { background: #1f9d55; }
+        .btn-red { background: #d64545; }
+        .btn-blue { background: #2c7be5; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>CNC 生產追蹤</h2>
+    <input id="order" placeholder="工單號碼" readonly>
+    <input id="targetQty" placeholder="訂單需求總數" readonly>
+    <input id="part" placeholder="圖號" readonly>
+
+    <select id="employee">
+        <option value="">選擇人員</option>
+        <option>EMP-01 Ateen Hsieh</option>
+        <option>EMP-02 林美溶</option>
+        <option>EMP-03 Li Mun</option>
+        <option>EMP-04 林明煌</option>
+        <option>EMP-05 吳黃石</option>
+        <option>EMP-06 PT</option>
+    </select>
+
+    <select id="machine">
+        <option value="">選擇機台</option>
+        <option>#1 車床 VTplus/15</option>
+        <option>#2 車床 V TURN-26</option>
+        <option>#3 車床 V TURN-26</option>
+        <option>#5 車床 VTplus/15</option>
+        <option>#6 車床 VTplus/15</option>
+        <option>#7 車床 VTplus/15</option>
+        <option>#8 六槽滾槽</option>
+        <option>#9 六槽滾槽</option>
+        <option>#10 銑床 Vcenter-102B</option>
+        <option>#11 銑床 NT-2055</option>
+        <option>#12 銑床 Vcenter-105</option>
+        <option>#13 滾齒機</option>
+    </select>
+
+    <input id="producedQty" type="number" placeholder="本次回報生產數量">
+
+    <button class="btn-green" onclick="saveRecord('開始')">開始加工</button>
+    <button class="btn-red" onclick="saveRecord('結束')">結束加工 (回報數量)</button>
+    <button class="btn-blue" onclick="exportCSV()">匯出歷史紀錄 (CSV)</button>
+
+    <p id="msg" style="text-align:center;"></p>
+</div>
+
+<script>
+    window.onload = function() {
+        let params = new URLSearchParams(window.location.search);
+        document.getElementById("order").value = params.get("order") || "";
+        document.getElementById("targetQty").value = params.get("targetQty") || "";
+        document.getElementById("part").value = params.get("part") || "";
+    };
+
+    function saveRecord(action) {
+        let emp = document.getElementById("employee").value;
+        let machine = document.getElementById("machine").value;
+        let produced = document.getElementById("producedQty").value;
+        let order = document.getElementById("order").value;
+        let part = document.getElementById("part").value;
+
+        if (!emp || !machine || !order) {
+            alert("請確認：人員、機台及工單資訊是否完整？");
+            return;
+        }
+
+        if (action === '結束' && !produced) {
+            alert("請填寫本次生產數量！");
+            return;
+        }
+
+        let record = {
+            order: order,
+            targetQty: document.getElementById("targetQty").value,
+            part: part,
+            producedQty: produced || 0,
+            employee: emp,
+            machine: machine,
+            action: action,
+            time: new Date().toLocaleString()
+        };
+
+        let data = JSON.parse(localStorage.getItem("CNC_Record") || "[]");
+        data.push(record);
+        localStorage.setItem("CNC_Record", JSON.stringify(data));
+
+        document.getElementById("msg").innerText = emp + " 已記錄 " + action + (produced ? " (" + produced + "個)" : "");
+        document.getElementById("producedQty").value = ""; 
+    }
+
+    function exportCSV() {
+        let data = JSON.parse(localStorage.getItem("CNC_Record") || "[]");
+        if (data.length === 0) { alert("沒有紀錄可匯出！"); return; }
+        let csvContent = "data:text/csv;charset=utf-8,\uFEFF時間,工單,零件,數量,人員,機台,動作\n" + 
+            data.map(r => `${r.time},${r.order},${r.part},${r.producedQty},${r.employee},${r.machine},${r.action}`).join("\n");
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "production_data.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+</script>
+</body>
+</html>
