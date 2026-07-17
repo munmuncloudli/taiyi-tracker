@@ -1,35 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工單專用 QR 產生器</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <title>工單 QR 產生器</title>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: auto; }
-        input { padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 15px; background: #007bff; color: white; border: none; font-size: 18px; border-radius: 5px; cursor: pointer; }
-        #qrcode { margin-top: 20px; text-align: center; }
-        .hint { font-size: 14px; color: #666; }
+        body { font-family: sans-serif; background: #1a1a1a; color: white; padding: 20px; text-align: center; }
+        input, button { width: 90%; max-width: 400px; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
+        button { background: #2c7be5; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h3>工單 QR 產生器</h3>
-    <p class="hint">掃描後，人員與機台請由現場作業員自行選擇。</p>
-    <input type="text" id="order" placeholder="工單號">
-    <input type="number" id="qty" placeholder="數量">
-    <input type="text" id="part" placeholder="零件名稱">
-    <button onclick="generate()">產生 QR Code</button>
-    <div id="qrcode"><canvas id="canvas"></canvas></div>
+    <h2>工單 QR 產生器</h2>
+    <input id="order" placeholder="工單號碼">
+    <input id="qty" placeholder="訂單需求總數">
+    <input id="part" placeholder="圖號">
+    <button onclick="generateQR()">產生 QR Code</button>
+    <div id="qrcode" style="margin: 20px auto; display: flex; justify-content: center; background: white; padding: 10px; width: fit-content;"></div>
 
     <script>
-        function generate() {
-            let o = document.getElementById('order').value;
-            let q = document.getElementById('qty').value;
-            let p = document.getElementById('part').value;
-            // 只帶入工單核心資訊
-            let url = `https://munmuncloudli.github.io/taiyi-tracker/?order=${o}&targetQty=${q}&part=${p}`;
-            QRCode.toCanvas(document.getElementById('canvas'), url, { width: 300 });
+        function generateQR() {
+            let o = encodeURIComponent(document.getElementById('order').value);
+            let q = encodeURIComponent(document.getElementById('qty').value);
+            let p = encodeURIComponent(document.getElementById('part').value);
+            let url = `https://munmuncloudli.github.io/taiyi-tracker/?order=${o}&qty=${q}&part=${p}`;
+            document.getElementById("qrcode").innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), url);
         }
     </script>
 </body>
