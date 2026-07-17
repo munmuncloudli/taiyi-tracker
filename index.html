@@ -21,7 +21,7 @@
     <input id="order" placeholder="工單號碼">
     <input id="targetQty" placeholder="訂單需求總數">
     <input id="part" placeholder="圖號">
-    
+
     <select id="employee">
         <option value="">選擇人員</option>
         <option>EMP-01 Ateen Hsieh (GM)</option>
@@ -32,7 +32,7 @@
         <option>EMP-06 PT 01 (支援)</option>
         <option>EMP-07 PT 02 (支援)</option>
     </select>
-    
+
     <select id="machine">
         <option value="">選擇機台</option>
         <option>#1 車床 VTplus/15 (MS-1454)</option>
@@ -48,7 +48,7 @@
         <option>#12 銑床 Vcenter-105 (MM-1125)</option>
         <option>#13 滾齒機 (H13 Gear Hobbing)</option>
     </select>
-    
+
     <input id="producedQty" type="number" placeholder="本次回報生產數量">
     <button class="btn-green" onclick="saveRecord('開始')">開始加工</button>
     <button class="btn-red" onclick="saveRecord('結束')">結束加工</button>
@@ -56,6 +56,19 @@
     <p id="msg" style="text-align:center;"></p>
 </div>
 <script>
+    // 頁面載入時，自動讀取網址參數並填入表單（來自 QR Code 掃描）
+    window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("order")) document.getElementById("order").value = params.get("order");
+        if (params.get("part")) document.getElementById("part").value = params.get("part");
+        if (params.get("targetQty")) document.getElementById("targetQty").value = params.get("targetQty");
+        if (params.get("producedQty")) document.getElementById("producedQty").value = params.get("producedQty");
+
+        if (params.get("order") || params.get("part")) {
+            document.getElementById("msg").innerText = "已從 QR Code 帶入資料";
+        }
+    };
+
     function saveRecord(action) {
         let rec = {
             time: new Date().toLocaleString(),
