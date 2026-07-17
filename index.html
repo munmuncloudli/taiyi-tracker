@@ -21,20 +21,34 @@
     <input id="order" placeholder="工單號碼">
     <input id="targetQty" placeholder="訂單需求總數">
     <input id="part" placeholder="圖號">
+    
     <select id="employee">
         <option value="">選擇人員</option>
-        <option>EMP-01 Ateen Hsieh</option>
-        <option>EMP-02 林美溶</option>
-        <option>EMP-03 Li Mun</option>
-        <option>EMP-04 林明煌</option>
-        <option>EMP-05 吳黃石</option>
+        <option>EMP-01 Ateen Hsieh (GM)</option>
+        <option>EMP-02 林美溶 (ADMIN)</option>
+        <option>EMP-03 Li Mun (ADMIN)</option>
+        <option>EMP-04 林明煌 (ENGINEER)</option>
+        <option>EMP-05 吳黃石 (OPERATOR)</option>
+        <option>EMP-06 PT 01 (支援)</option>
+        <option>EMP-07 PT 02 (支援)</option>
     </select>
+    
     <select id="machine">
         <option value="">選擇機台</option>
-        <option>#1 車床 VTplus/15</option>
-        <option>#10 銑床 Vcenter-102B</option>
-        <option>#13 滾齒機</option>
+        <option>#1 車床 VTplus/15 (MS-1454)</option>
+        <option>#2 車床 V TURN-26 (UC-1318)</option>
+        <option>#3 車床 V TURN-26 (UC-1213)</option>
+        <option>#5 車床 VTplus/15 (S2-1140)</option>
+        <option>#6 車床 VTplus/15 (MS-1131)</option>
+        <option>#7 車床 VTplus/15 (S2-1142)</option>
+        <option>#8 六槽滾槽 (MSP-LB97-5122)</option>
+        <option>#9 六槽滾槽 (MSP-LB97-5042)</option>
+        <option>#10 銑床 Vcenter-102B (WB-1291)</option>
+        <option>#11 銑床 NT-2055</option>
+        <option>#12 銑床 Vcenter-105 (MM-1125)</option>
+        <option>#13 滾齒機 (H13 Gear Hobbing)</option>
     </select>
+    
     <input id="producedQty" type="number" placeholder="本次回報生產數量">
     <button class="btn-green" onclick="saveRecord('開始')">開始加工</button>
     <button class="btn-red" onclick="saveRecord('結束')">結束加工</button>
@@ -46,6 +60,7 @@
         let rec = {
             time: new Date().toLocaleString(),
             order: document.getElementById("order").value,
+            part: document.getElementById("part").value,
             producedQty: document.getElementById("producedQty").value || 0,
             employee: document.getElementById("employee").value,
             machine: document.getElementById("machine").value,
@@ -58,7 +73,8 @@
     }
     function exportCSV() {
         let data = JSON.parse(localStorage.getItem("CNC_Record") || "[]");
-        let csv = "\uFEFF時間,工單,數量,人員,機台,動作\n" + data.map(r => `${r.time},${r.order},${r.producedQty},${r.employee},${r.machine},${r.action}`).join("\n");
+        if (data.length === 0) { alert("沒有紀錄可匯出！"); return; }
+        let csv = "\uFEFF時間,工單,圖號,數量,人員,機台,動作\n" + data.map(r => `${r.time},${r.order},${r.part},${r.producedQty},${r.employee},${r.machine},${r.action}`).join("\n");
         let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         let link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
