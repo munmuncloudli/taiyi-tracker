@@ -15,7 +15,7 @@
     <input id="order" placeholder="工單號">
     <input id="customer" placeholder="客戶">
     <input id="part" placeholder="圖號">
-    <input id="producedQty" placeholder="數量">
+    <input id="targetQty" placeholder="數量（訂單需求總數）">
     <button onclick="generateQR()">產生 QR Code</button>
     <div id="qrcode" style="margin-top:20px; display: flex; justify-content: center;"></div>
 
@@ -24,11 +24,12 @@
             let o = encodeURIComponent(document.getElementById('order').value);
             let c = encodeURIComponent(document.getElementById('customer').value);
             let p = encodeURIComponent(document.getElementById('part').value);
-            let q = encodeURIComponent(document.getElementById('producedQty').value);
-            
-            // 這些參數名稱完全對應到網頁 ID，實現自動填入
-            let url = `https://munmuncloudli.github.io/taiyi-tracker/?order=${o}&customer=${c}&part=${p}&producedQty=${q}`;
-            
+            let t = encodeURIComponent(document.getElementById('targetQty').value);
+
+            // 數量欄位對應到 CNC 表格的「訂單需求總數」(targetQty)
+            // 「本次回報生產數量」不在 QR 內，由員工現場輸入
+            let url = `https://munmuncloudli.github.io/taiyi-tracker/?order=${o}&customer=${c}&part=${p}&targetQty=${t}`;
+
             document.getElementById("qrcode").innerHTML = "";
             new QRCode(document.getElementById("qrcode"), url);
         }
